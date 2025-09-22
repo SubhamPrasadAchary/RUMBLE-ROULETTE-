@@ -7,6 +7,8 @@ function App() {
   const [money, setMoney] = useState(5000);
   const [currentToken, setCurrentToken] = useState(100);
   const [bets, setBets] = useState({}); // { 'number': { amount: number, token: number } }
+  const [winModal, setWinModal] = useState({ open: false, amount: 0, bets: [] });
+  const [lossModal, setLossModal] = useState({ open: false, amount: 0 });
 
   // Roulette numbers in the correct layout with 2 to 1 on the right
   const rouletteNumbers = [
@@ -143,9 +145,11 @@ function App() {
     // Update money
     setMoney(prev => prev + winnings);
     
-    // Show winning bets if any
-    if (winningBets.length > 0) {
-      alert(`You won ${winnings} on: ${winningBets.join(', ')}`);
+    // Show winning bets if any via modal; otherwise show a loss modal
+    if (winnings > 0) {
+      setWinModal({ open: true, amount: winnings, bets: winningBets });
+    } else {
+      setLossModal({ open: true, amount: totalBet });
     }
     
     // Clear all bets
@@ -298,6 +302,41 @@ function App() {
           </div>
         )}
       </div>
+      {/* Win modal */}
+      {winModal.open && (
+        <div className="modal-overlay" onClick={() => setWinModal({ open: false, amount: 0, bets: [] })}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Congratulations! 🎉</h3>
+            <p className="win-amount">You won ₹{winModal.amount}</p>
+            {winModal.bets?.length > 0 && (
+              <p className="win-detail">Winning bets: {winModal.bets.join(', ')}</p>
+            )}
+            <button
+              className="modal-btn"
+              onClick={() => setWinModal({ open: false, amount: 0, bets: [] })}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loss modal */}
+      {lossModal.open && (
+        <div className="modal-overlay" onClick={() => setLossModal({ open: false, amount: 0 })}>
+          <div className="modal loss" onClick={(e) => e.stopPropagation()}>
+            <h3>Better luck next time ❗</h3>
+            <p className="loss-amount">You lost ₹{lossModal.amount}</p>
+            <p className="win-detail">No win this time. Better luck next time!</p>
+            <button
+              className="modal-btn"
+              onClick={() => setLossModal({ open: false, amount: 0 })}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
