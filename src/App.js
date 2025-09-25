@@ -9,6 +9,8 @@ function App() {
   const [bets, setBets] = useState({}); // { 'number': { amount: number, token: number } }
   const [winModal, setWinModal] = useState({ open: false, amount: 0, bets: [] });
   const [lossModal, setLossModal] = useState({ open: false, amount: 0 });
+  const [history, setHistory] = useState([]); // queue of last 10 results
+  const [showHistory, setShowHistory] = useState(false);
 
   // Roulette numbers in the correct layout with 2 to 1 on the right
   const rouletteNumbers = [
@@ -140,6 +142,20 @@ function App() {
         winnings += winAmount;
         winningBets.push(`${bet} (${winAmount})`);
       }
+    });
+    
+    // Record into history queue (last 10)
+    const historyEntry = {
+      timestamp: new Date().toLocaleString(),
+      spin: number,
+      totalBet,
+      winnings,
+      outcome: winnings > 0 ? 'WIN' : 'LOSS',
+      bets: Object.entries(bets).map(([bet, { amount }]) => `${bet}: ₹${amount}`)
+    };
+    setHistory((prev) => {
+      const next = [historyEntry, ...prev];
+      return next.slice(0, 10);
     });
     
     // Update money
@@ -296,6 +312,12 @@ function App() {
         >
           {isGenerating ? '🎰 Spinning... 🎰' : '🎡 SPIN THE WHEEL 🎡'}
         </button>
+        <button
+          className="history-btn"
+          onClick={() => setShowHistory(true)}
+        >
+          📜 History
+        </button>
         {selectedNumbers.size > 0 && (
           <div className="selected-numbers">
             <p>Selected: {Array.from(selectedNumbers).join(', ')}</p>
@@ -334,6 +356,38 @@ function App() {
             >
               OK
             </button>
+          </div>
+        </div>
+      )}
+      
+      {/* History modal */}
+      {showHistory && (
+        <div className="modal-overlay" onClick={() => setShowHistory(false)}>
+          <div className="modal history" onClick={(e) => e.stopPropagation()}>
+            <h3>Bet History (Last 10)</h3>
+            {history.length === 0 ? (
+              <p className="win-detail">No bets yet.</p>
+            ) : (
+              <ul className="history-list">
+                {history.map((h, idx) => (
+                  <li key={idx} className={`history-item ${h.outcome.toLowerCase()}`}>
+                    <div className="history-row">
+                      <span className="history-time">{h.timestamp}</span>
+                      <span className="history-spin">Spin: {h.spin}</span>
+                    </div>
+                    <div className="history-row">
+                      <span>Bet: ₹{h.totalBet}</span>
+                      <span>Winnings: ₹{h.winnings}</span>
+                      <span className={`history-outcome ${h.outcome.toLowerCase()}`}>{h.outcome}</span>
+                    </div>
+                    {h.bets?.length > 0 && (
+                      <div className="history-bets">Bets: {h.bets.join(', ')}</div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button className="modal-btn" onClick={() => setShowHistory(false)}>Close</button>
           </div>
         </div>
       )}
