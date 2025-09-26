@@ -350,6 +350,14 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative; /* Ensure pseudo-elements are positioned relative to this box */
+  overflow: hidden;   /* Prevent spinner from spilling outside */
+}
+
+/* Enhance the generating state with extra glow and wobble */
+.number-display.generating {
+  /* Preserve the base pulse animation and add glow */
+  animation: pulse 2s infinite, glowPulse 1.8s ease-in-out infinite;
 }
 
 .generate-btn {
@@ -432,6 +440,18 @@ h1 {
   100% { transform: rotate(360deg); }
 }
 
+/* Removed sweep animation (ring effect disabled) */
+
+/* Gentle glow pulsing on the number box */
+@keyframes glowPulse {
+  0%   { box-shadow: 0 0 15px rgba(255, 215, 0, 0.25), inset 0 0 6px rgba(255, 255, 255, 0.06); }
+  50%  { box-shadow: 0 0 26px rgba(255, 215, 0, 0.45), inset 0 0 10px rgba(255, 255, 255, 0.1); }
+  100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.25), inset 0 0 6px rgba(255, 255, 255, 0.06); }
+}
+
+/* Removed wobble keyframes */
+
+/* Generic generating spinner (kept for other components if any) */
 .generating::after {
   content: "";
   display: inline-block;
@@ -443,6 +463,17 @@ h1 {
   border-top-color: white;
   animation: spin 1s ease-in-out infinite;
 }
+
+/* Specifically keep the spinner centered inside the number box */
+/* Hide the inner spinner for number display; we only want a glow */
+.number-display.generating::after {
+  content: none;
+}
+
+/* Remove rotating ring (no ::before decoration for generating state) */
+
+/* No wobble on content; keep it steady during glow */
+.number-display.generating > * { animation: none; }
 
 /* --- Win Modal --- */
 .modal-overlay {
