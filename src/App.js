@@ -59,6 +59,8 @@ function App() {
   };
   
   const toggleSelection = (selection) => {
+    // Prevent changing bets while the wheel is spinning
+    if (isGenerating) return;
     const newSelections = new Set(selectedNumbers);
     
     if (bets[selection]) {
@@ -181,12 +183,17 @@ function App() {
     }
     
     setIsGenerating(true);
+    // Clear previous number to build suspense
+    setRandomNumber(null);
     setTimeout(() => {
       const newNumber = Math.floor(Math.random() * 37); // 0-36 inclusive
       setRandomNumber(newNumber);
-      checkWin(newNumber);
-      setIsGenerating(false);
-    }, 500);
+      // After revealing the number, wait 1500ms before showing win/loss
+      setTimeout(() => {
+        checkWin(newNumber);
+        setIsGenerating(false);
+      }, 1500);
+    }, 3000);
   };
 
   return (
@@ -302,7 +309,7 @@ function App() {
       </div>
       
       <div className="generator-section">
-        <div className="number-display" style={{ color: getNumberColor(randomNumber) }}>
+        <div className={`number-display ${isGenerating ? 'generating' : ''}`} style={{ color: getNumberColor(randomNumber) }}>
           {randomNumber !== null ? randomNumber : '?'}
         </div>
         <button 
