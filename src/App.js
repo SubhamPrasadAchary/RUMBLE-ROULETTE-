@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 function App() {
   const [randomNumber, setRandomNumber] = useState(null);
@@ -11,6 +11,103 @@ function App() {
   const [lossModal, setLossModal] = useState({ open: false, amount: 0 });
   const [history, setHistory] = useState([]); // queue of last 10 results
   const [showHistory, setShowHistory] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [winSoundReady, setWinSoundReady] = useState(false);
+  const [lossSoundReady, setLossSoundReady] = useState(false);
+
+  // Audio refs for win/loss sounds
+  const winAudioRef = useRef(null);
+  const lossAudioRef = useRef(null);
+
+  // Initialize audio objects once and configure
+  useEffect(() => {
+    let disposed = false;
+
+    const setup = async () => {
+      try {
+        const [winOk, lossOk] = await Promise.all([
+          fetch('/sounds/win.mp3', { method: 'HEAD' }).then(r => r.ok).catch(() => false),
+          fetch('/sounds/loss.mp3', { method: 'HEAD' }).then(r => r.ok).catch(() => false)
+        ]);
+        if (disposed) return;
+
+        // Set up WIN audio if present
+        if (winOk) {
+          const winAudio = new Audio('/sounds/win.mp3');
+          winAudio.preload = 'auto';
+          winAudio.volume = 0.7;
+          const onWinReady = () => setWinSoundReady(true);
+          const onWinError = () => setWinSoundReady(false);
+          winAudio.addEventListener('canplaythrough', onWinReady, { once: true });
+          winAudio.addEventListener('error', onWinError);
+          winAudioRef.current = winAudio;
+        } else {
+          setWinSoundReady(false);
+          winAudioRef.current = null;
+        }
+
+        // Set up LOSS audio if present
+        if (lossOk) {
+          const lossAudio = new Audio('/sounds/loss.mp3');
+          lossAudio.preload = 'auto';
+          lossAudio.volume = 0.6;
+          const onLossReady = () => setLossSoundReady(true);
+          const onLossError = () => setLossSoundReady(false);
+          lossAudio.addEventListener('canplaythrough', onLossReady, { once: true });
+          lossAudio.addEventListener('error', onLossError);
+          lossAudioRef.current = lossAudio;
+        } else {
+          setLossSoundReady(false);
+          lossAudioRef.current = null;
+        }
+      } catch (_) {
+        // If HEAD fails (offline, dev server not ready), keep refs null
+        setWinSoundReady(false);
+        setLossSoundReady(false);
+        winAudioRef.current = null;
+        lossAudioRef.current = null;
+      }
+    };
+
+    setup();
+
+    // Cleanup on unmount
+    return () => {
+      disposed = true;
+      if (winAudioRef.current) {
+        winAudioRef.current.pause();
+      }
+      if (lossAudioRef.current) {
+        lossAudioRef.current.pause();
+      }
+    };
+  }, []);
+
+  // Web Audio API fallback beep when mp3s are unavailable
+  const playBeep = (type) => {
+    try {
+      if (muted) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      // Different pitch for win/loss
+      o.frequency.value = type === 'win' ? 880 : 220; // A5 vs A3
+      g.gain.value = 0.001;
+      o.connect(g);
+      g.connect(ctx.destination);
+      const now = ctx.currentTime;
+      // Simple short envelope
+      g.gain.exponentialRampToValueAtTime(0.2, now + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+      o.start(now);
+      o.stop(now + 0.22);
+      // Close context shortly after to free resources
+      setTimeout(() => ctx.close(), 300);
+    } catch (_) { /* no-op */ }
+  };
 
   // Roulette numbers in the correct layout with 2 to 1 on the right
   const rouletteNumbers = [
@@ -165,8 +262,20 @@ function App() {
     
     // Show winning bets if any via modal; otherwise show a loss modal
     if (winnings > 0) {
+      // Play win sound (only if loaded/ready), else fallback beep
+      if (!muted && winAudioRef.current && winSoundReady) {
+        try { winAudioRef.current.currentTime = 0; winAudioRef.current.play(); } catch (e) { /* no-op */ }
+      } else {
+        playBeep('win');
+      }
       setWinModal({ open: true, amount: winnings, bets: winningBets });
     } else {
+      // Play loss sound (only if loaded/ready), else fallback beep
+      if (!muted && lossAudioRef.current && lossSoundReady) {
+        try { lossAudioRef.current.currentTime = 0; lossAudioRef.current.play(); } catch (e) { /* no-op */ }
+      } else {
+        playBeep('loss');
+      }
       setLossModal({ open: true, amount: totalBet });
     }
     
@@ -318,6 +427,12 @@ function App() {
           disabled={isGenerating}
         >
           {isGenerating ? '🎰 Spinning... 🎰' : '🎡 SPIN THE WHEEL 🎡'}
+        </button>
+        <button
+          className="history-btn"
+          onClick={() => setMuted(m => !m)}
+        >
+          {muted ? '🔇 Unmute' : '🔊 Mute'}
         </button>
         <button
           className="history-btn"
