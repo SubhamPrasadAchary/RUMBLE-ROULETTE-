@@ -3,5 +3,7 @@ Experience the thrill of roulette with this interactive online game! Place your 
 
 https://rumble-roulette.vercel.app/
 
-<img width="600" height="879" alt="image" src="https://github.com/user-attachments/assets/8c80bb0d-208d-4ea0-a811-e9644191e1e1" />
-<img width="600" height="880" alt="image" src="https://github.com/user-attachments/assets/16d6ef7a-7f3b-473a-9d03-49bb5d2723e9" />
+<img width="600" height="880" alt="image" src="https://github.com/user-attachments/assets/760f3849-14f3-479c-9358-6b8370453bea" />
+
+<img width="600" height="880" alt="image" src="https://github.com/user-attachments/assets/7c1fe996-6740-482a-b379-6cc76aec2bda" />
+
