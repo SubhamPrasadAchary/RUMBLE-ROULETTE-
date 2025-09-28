@@ -199,32 +199,36 @@ function App() {
   
   // Handle win/loss
   const checkWin = (number) => {
+    // winnings represents the TOTAL returned for winning bets (stake + profit)
+    // Since stakes are deducted when placing bets, adding total returns here yields correct net results.
     let winnings = 0;
     const winningBets = [];
-    let multiplier = 0;
     
     // Check each bet
     Object.entries(bets).forEach(([bet, { amount }]) => {
+      // Reset per-bet multiplier to avoid carry-over
+      let multiplier = 0;
+
       if (bet === number.toString()) { // Direct hit
-        multiplier = 35; // 35:1 for straight up
+        multiplier = 36; // total return 36x for straight up (35:1)
       } 
-      // Check for 2:1 bets
+      // Check for 2:1 column bets (total return 3x)
       else if (
         (bet === '2 to 1 (1st)' && [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36].includes(number)) ||
         (bet === '2 to 1 (2nd)' && [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35].includes(number)) ||
         (bet === '2 to 1 (3rd)' && [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34].includes(number))
       ) {
-        multiplier = 2; // 2:1 for column bets
+        multiplier = 3; // total return 3x for column bets
       }
-      // Check for 12-number bets (1st/2nd/3rd 12)
+      // Check for 12-number bets (1st/2nd/3rd 12) total return 3x
       else if (
         (bet === '1st 12' && number >= 1 && number <= 12) ||
         (bet === '2nd 12' && number >= 13 && number <= 24) ||
         (bet === '3rd 12' && number >= 25 && number <= 36)
       ) {
-        multiplier = 2; // 2:1 for 12-number bets
+        multiplier = 3; // total return 3x for 12-number bets
       }
-      // Check for even money bets
+      // Check for even money bets (total return 2x)
       else if (
         (bet === 'RED' && getNumberColor(number) === 'red') ||
         (bet === 'BLACK' && getNumberColor(number) === 'black') ||
@@ -233,13 +237,13 @@ function App() {
         (bet === '1-18' && number >= 1 && number <= 18) ||
         (bet === '19-36' && number >= 19 && number <= 36)
       ) {
-        multiplier = 1; // 1:1 for even money bets
+        multiplier = 2; // total return 2x for even money bets (1:1)
       }
-      
+
       if (multiplier > 0) {
-        const winAmount = amount * (multiplier + 1);
+        const winAmount = amount * multiplier; // total return (stake + profit)
         winnings += winAmount;
-        winningBets.push(`${bet} (${winAmount})`);
+        winningBets.push(`${bet} (₹${winAmount})`);
       }
     });
     
@@ -307,11 +311,20 @@ function App() {
 
   return (
     <div className="app">
+      {/* Floating Mute Button (top-right) */}
+      <button
+        className={`mute-btn ${muted ? 'muted' : ''}`}
+        onClick={() => setMuted(m => !m)}
+        aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
+        title={muted ? 'Unmute' : 'Mute'}
+      >
+        {muted ? '🔇' : '🔊'}
+      </button>
       <div className="money-display">
         <h2>Money: ₹{money}</h2>
         <div className="token-selector">
           <h3>Select Token:</h3>
-          {[100, 200, 500].map(token => (
+          {[20, 50, 100, 200, 250, 500, 1000].map(token => (
             <button
               key={token}
               className={`token-btn ${currentToken === token ? 'active' : ''}`}
@@ -427,12 +440,6 @@ function App() {
           disabled={isGenerating}
         >
           {isGenerating ? '🎰 Spinning... 🎰' : '🎡 SPIN THE WHEEL 🎡'}
-        </button>
-        <button
-          className="history-btn"
-          onClick={() => setMuted(m => !m)}
-        >
-          {muted ? '🔇 Unmute' : '🔊 Mute'}
         </button>
         <button
           className="history-btn"
