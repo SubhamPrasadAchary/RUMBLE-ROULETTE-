@@ -159,30 +159,42 @@ function App() {
     // Prevent changing bets while the wheel is spinning
     if (isGenerating) return;
     const newSelections = new Set(selectedNumbers);
+    const newBets = { ...bets };
     
     if (bets[selection]) {
       // If already has a bet, remove it
       removeBet(selection);
       newSelections.delete(selection);
     } else {
-      // For outside bets, first remove any other selections in the same category
-      const outsideBets = [
-        '1st 12', '2nd 12', '3rd 12',
-        '1-18', '19-36',
-        'EVEN', 'ODD',
-        'RED', 'BLACK'
-      ];
-      
-      // Remove any other outside bet in the same category
-      if (outsideBets.includes(selection)) {
-        outsideBets.forEach(bet => {
-          if (bet !== selection && bets[bet]) {
-            removeBet(bet);
-            newSelections.delete(bet);
-          }
-        });
+      // For outside bets, enforce exclusivity within their own category only
+      const categories = {
+        dozens: ['1st 12', '2nd 12', '3rd 12'],
+        halves: ['1-18', '19-36'],
+        parity: ['EVEN', 'ODD'],
+        color: ['RED', 'BLACK']
+      };
+
+      // Find which category the selection belongs to (if any)
+      const categoryKey = Object.keys(categories).find(key => categories[key].includes(selection));
+
+      if (categoryKey) {
+        // If there is an existing bet in this category, transfer its amount to the new selection
+        const existingKey = categories[categoryKey].find(betKey => newBets[betKey]);
+        if (existingKey && existingKey !== selection) {
+          const moved = newBets[existingKey].amount;
+          const movedToken = newBets[existingKey].token ?? currentToken;
+          delete newBets[existingKey];
+          newBets[selection] = { amount: moved, token: movedToken };
+          setBets(newBets);
+          // Update selections set
+          newSelections.delete(existingKey);
+          newSelections.add(selection);
+          setSelectedNumbers(newSelections);
+          // Do NOT change money here to keep the total the same
+          return;
+        }
       }
-      
+
       // Place new bet
       placeBet(selection);
       newSelections.add(selection);
