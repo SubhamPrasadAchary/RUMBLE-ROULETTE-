@@ -28,4 +28,3 @@ https://rumble-roulette.vercel.app/
 <img width="600" height="880" alt="image" src="https://github.com/user-attachments/assets/760f3849-14f3-479c-9358-6b8370453bea" />
 
 <img width="600" height="880" alt="image" src="https://github.com/user-attachments/assets/7c1fe996-6740-482a-b379-6cc76aec2bda" />
-
