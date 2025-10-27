@@ -19,7 +19,6 @@ function App() {
   const winAudioRef = useRef(null);
   const lossAudioRef = useRef(null);
 
-  // Initialize audio objects once and configure
   useEffect(() => {
     let disposed = false;
 
@@ -117,7 +116,6 @@ function App() {
   ];
   
   // Zero is a special case that will be positioned to the left of number 2
-
   const getNumberColor = (num) => {
     if (num === 0 || (typeof num === 'string' && num.startsWith('2 to 1'))) return 'green';
     const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
