@@ -1,17 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Play Roulette - A fun and interactive roulette game with number generator (0-36)" />
     <title>Roulette Game - Play Online</title>
+    <style>
+      :root {
+        --bg-color: #ffffff;
+        --text-color: #000000;
+        --accent-color: #d32f2f;
+        --button-bg: #f0f0f0;
+        --button-hover: #e0e0e0;
+      }
+      
+      [data-theme="dark"] {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --accent-color: #ff6b6b;
+        --button-bg: #2d2d2d;
+        --button-hover: #3d3d3d;
+      }
+      
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
+        margin: 0;
+        min-height: 100vh;
+      }
+      
+      .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--button-bg);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: background-color 0.3s;
+      }
+      
+      .theme-toggle:hover {
+        background: var(--button-hover);
+      }
+      
+      .theme-toggle i {
+        font-size: 1.2rem;
+        color: var(--text-color);
+      }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <i class="fas fa-moon"></i>
+    </button>
     <div id="root"></div>
+    <script>
+      // Theme toggle functionality
+      const themeToggle = document.getElementById('themeToggle');
+      const html = document.documentElement;
+      const themeIcon = themeToggle.querySelector('i');
+      
+      // Check for saved theme preference or use system preference
+      const savedTheme = localStorage.getItem('theme') || 
+                        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      
+      // Apply the saved theme
+      html.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+      
+      // Toggle theme on button click
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        // Update theme and save preference
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+      });
+      
+      // Update the theme icon based on current theme
+      function updateThemeIcon(theme) {
+        if (theme === 'dark') {
+          themeIcon.className = 'fas fa-sun';
+        } else {
+          themeIcon.className = 'fas fa-moon';
+        }
+      }
+    </script>
   </body>
 </html>
