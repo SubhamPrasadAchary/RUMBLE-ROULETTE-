@@ -3,10 +3,16 @@ body {
   font-family: 'Arial', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0a5c36;
+  background-color: #0a5c36; /* Green background for light mode */
   color: white;
   min-height: 100vh;
   padding: 20px 0;
+  transition: background-color 0.3s ease;
+}
+
+/* Dark mode styles */
+[data-theme="dark"] body {
+  background-color: #000; /* Black background for dark mode */
 }
 
 .app {
@@ -15,6 +21,16 @@ body {
   padding: 20px;
   text-align: center;
   font-family: 'Arial', sans-serif;
+  background-color: #0a5c36; /* Green background for light mode */
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s ease;
+}
+
+/* Dark mode styles */
+[data-theme="dark"] .app {
+  background-color: #121212; /* Slightly lighter than pure black for better contrast */
+  border: 1px solid #333;
 }
 
 /* Money and Token Styles */
