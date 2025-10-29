@@ -25,6 +25,9 @@ It’s not just a game — it’s an experience filled with suspense, excitement
 
 https://rumble-roulette.vercel.app/
 
-<img width="600" height="880" alt="image" src="https://github.com/user-attachments/assets/760f3849-14f3-479c-9358-6b8370453bea" />
+<img width="847" height="952" alt="image" src="https://github.com/user-attachments/assets/00ebbf58-36a4-446e-832b-9c714b859e12" />
+<img width="831" height="932" alt="image" src="https://github.com/user-attachments/assets/756daaed-36ab-4e0d-8b7e-5fc951499758" />
 
-<img width="600" height="880" alt="image" src="https://github.com/user-attachments/assets/7c1fe996-6740-482a-b379-6cc76aec2bda" />
+
+
+
