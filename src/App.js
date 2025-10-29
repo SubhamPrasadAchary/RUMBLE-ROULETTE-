@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import './App.css';
 
 function App() {
   const [randomNumber, setRandomNumber] = useState(null);
@@ -14,10 +15,33 @@ function App() {
   const [muted, setMuted] = useState(false);
   const [winSoundReady, setWinSoundReady] = useState(false);
   const [lossSoundReady, setLossSoundReady] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Check for saved theme preference or use system preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) return savedTheme === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   // Audio refs for win/loss sounds
   const winAudioRef = useRef(null);
   const lossAudioRef = useRef(null);
+
+  // Apply dark/light theme class to body
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-theme');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-theme');
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+    // Save theme preference
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   useEffect(() => {
     let disposed = false;
@@ -321,15 +345,25 @@ function App() {
 
   return (
     <div className="app">
-      {/* Floating Mute Button (top-right) */}
-      <button
-        className={`mute-btn ${muted ? 'muted' : ''}`}
-        onClick={() => setMuted(m => !m)}
-        aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
-        title={muted ? 'Unmute' : 'Mute'}
-      >
-        {muted ? '🔇' : '🔊'}
-      </button>
+      {/* Floating Buttons (top-right) */}
+      <div className="floating-buttons">
+        <button
+          className={`theme-toggle-btn ${darkMode ? 'dark' : 'light'}`}
+          onClick={toggleDarkMode}
+          aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={darkMode ? 'Light Mode' : 'Dark Mode'}
+        >
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+        <button
+          className={`mute-btn ${muted ? 'muted' : ''}`}
+          onClick={() => setMuted(m => !m)}
+          aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
+          title={muted ? 'Unmute' : 'Mute'}
+        >
+          {muted ? '🔇' : '🔊'}
+        </button>
+      </div>
       <div className="money-display">
         <h2>Money: ₹{money}</h2>
         <div className="token-selector">
