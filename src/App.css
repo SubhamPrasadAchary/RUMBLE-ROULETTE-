@@ -45,7 +45,9 @@ body {
 .floating-buttons {
   position: fixed;
   top: 80px;
-  right: 14px;
+  right: 830px;
+  width: px;
+  height: 48px;
   display: flex;
   flex-direction: column;
   gap: 10px;
