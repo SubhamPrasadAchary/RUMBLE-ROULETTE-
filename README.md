@@ -15,7 +15,7 @@ It’s not just a game — it’s an experience filled with suspense, excitement
 🎨 Elegant Design & Smooth Transitions
 📱 Fully Responsive — Play Anytime, Anywhere!
 🎉 Endless Fun — Test Your Luck Again & Again!
-
+ 
 🚀 Whether you’re a developer exploring creative web projects or just someone who loves the casino vibe, this roulette table will keep you hooked! 💻❤️
 
 ✨ So, what are you waiting for?
